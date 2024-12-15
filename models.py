@@ -99,26 +99,18 @@ class MyCNNWithTransferLearning(nn.Module):
         # Cargar el modelo preentrenado DenseNet121
         self.densenet = models.densenet121(pretrained=True)
 
-        # Congelar las capas del modelo preentrenado (opcional)
-        for param in self.densenet.parameters():
+        # Congelar las capas del modelo preentrenado para evitar sobreajuste
+        for param in self.densenet.features.parameters():
             param.requires_grad = False
 
-        # Modificar la capa final del DenseNet para ajustarla a 10 clases
-        # DenseNet121 tiene una capa final de clasificación de 1024 a 1000 clases, la reemplazamos por 10 clases
-        self.densenet.classifier = nn.Linear(self.densenet.classifier.in_features, num_classes)
-
-        # Añadir capas adicionales si lo deseas, por ejemplo:
-        self.fc1 = nn.Linear(num_classes, 128)  # Capa adicional
-        self.fc2 = nn.Linear(128, num_classes)  # Capa de salida
-
-        self.relu = nn.ReLU()
+        # Modificar la capa final del DenseNet para ajustarla a las clases deseadas
+        self.densenet.classifier = nn.Sequential(
+            nn.Linear(self.densenet.classifier.in_features, 512),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(512, num_classes)
+        )
 
     def forward(self, x):
-        # Pasar la entrada por el modelo preentrenado (DenseNet)
-        x = self.densenet(x)
-
-        # Si se añaden capas adicionales, pasar por ellas
-        x = self.relu(self.fc1(x))
-        x = self.fc2(x)
-
-        return x
+        # Forward pass a través de DenseNet
+        return self.densenet(x)
