@@ -1,4 +1,4 @@
-En este documento se describe cada uno de los archivos del repositorio:
+Descripción de los documentos del repositorio:
 - _archive_: Carpeta que contiene los datos de entrenamiento, validación y test. 
 - _Memoria.pdf_: Documento explicativo del trabajo realizado.
 - _remove\_classes.ipynb_: Cuaderno utilizado para eliminar las carpetas de las clases desechadas.
